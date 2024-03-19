@@ -335,6 +335,12 @@ closureFunction(); // 输出：I am from outer function
 
 :::
 
+::: details 事件冒泡和事件捕获
+:::
+
+::: details 模块化
+:::
+
 ::: details 【ES6】 - Promise
 :::
 
@@ -361,6 +367,14 @@ closureFunction(); // 输出：I am from outer function
 
 :::
 
+## Builder
+::: details 什么是 Webpack？它是如何工作的？
+:::
+::: details 什么是 Babel？它是如何转换 ES6 代码的？
+:::
+::: details 什么是持续集成/持续部署（CI/CD）？
+:::
+
 ## Browser
 
 ::: details 同源策略与跨域限制
@@ -383,4 +397,23 @@ closureFunction(); // 输出：I am from outer function
 
 8. 跨域的 Service Worker 请求：Service Worker 中发起的跨域请求会受到跨域限制。
 
+:::
+
+::: details 如何减少页面的重绘和重排？
+:::
+
+::: details 什么是服务端渲染（SSR）？它的优势是什么？
+:::
+
+::: details 如何优化网页的加载速度？
+:::
+
+::: details 如何减少页面的重绘和重排？
+:::
+
+## Internet
+
+::: details HTTP 和 HTTPS 的区别是什么？
+:::
+::: details 什么是 XSS 和 CSRF？如何防止这些攻击？
 :::
