@@ -314,6 +314,51 @@ obj.func();
 :::
 
 ::: details call、apply、bind
+call、apply 和 bind 是 JavaScript 中用于处理函数调用和函数上下文（即 this 的值）的三个方法。它们之间有一些关键的区别：
+
+call:
+
+call 方法使用一个指定的 this 值和一系列参数来调用一个函数。
+它是 apply 方法的缩写形式，参数列表是直接传递给 call 的，而不是作为一个数组。
+示例代码：
+
+```js
+function greet() {
+  console.log('Hello ' + this.name);
+}
+var person = { name: 'Kimi' };
+greet.call(person); // 输出: Hello Kimi
+```
+
+apply:
+apply 方法也是用来调用一个函数，同时可以指定函数调用时的 this 值和参数。
+与 call 不同的是，apply 方法接受一个参数数组，而不是直接的参数列表。
+示例代码：
+
+```js
+function greet(greeting, punctuation) {
+  console.log(greeting + ' ' + this.name + punctuation);
+}
+var person = { name: 'Kimi' };
+greet.apply(person, ['Hello', '!']); // 输出: Hello Kimi!
+```
+
+bind:
+
+bind 方法创建一个新的函数，当被调用时，它的 this 值被设置为 bind 方法的第一个参数，而其余参数将作为新函数的首批参数。
+bind 不会立即执行函数，而是返回一个新的函数，这个新函数可以稍后执行。
+示例代码：
+
+```js
+function greet(greeting, punctuation) {
+  console.log(greeting + ' ' + this.name + punctuation);
+}
+var person = { name: 'Kimi' };
+var boundGreet = greet.bind(person, 'Hello', '!');
+boundGreet(); // 输出: Hello Kimi!
+```
+
+总结来说，call 和 apply 都是用来立即调用函数的，区别在于传递参数的方式不同。而 bind 是用来创建一个新的函数，这个新函数可以保留 this 值和预设的参数，但它不会立即执行，而是可以保存起来，以后再执行。
 :::
 
 ::: details 闭包
@@ -336,9 +381,161 @@ closureFunction(); // 输出：I am from outer function
 :::
 
 ::: details 事件冒泡和事件捕获
+事件冒泡（Event Bubbling）和事件捕获（Event Capturing）是 JavaScript 中处理事件传播的两种模式。它们定义了事件是如何从页面中的具体元素传播到更广泛的 DOM 树中的。
+
+1.  **事件冒泡**:
+    
+-   事件冒泡是默认的事件传播方式。
+-   当事件发生在一个元素上时，它首先被该元素本身处理，然后依次向上冒泡到父元素，直到根节点（`document`对象）。
+-   事件冒泡允许父元素监听并处理子元素上的事件，这在很多情况下非常有用，例如当有多个子元素共享相同的事件处理器时。
+-   通过 `event.stopPropagation()` 方法可以阻止事件继续冒泡。
+
+2.  **事件捕获**:
+    
+-   事件捕获是事件处理的另一种方式，它与冒泡相反。
+-   在事件捕获中，事件首先被根节点（`document`对象）处理，然后依次向下传递到目标元素。
+-   这意味着父元素会先于子元素接收到事件，这可以用来实现一些需要在事件到达目标元素之前进行处理的场景，如键盘事件的全局拦截。
+-   通过 `event.preventDefault()` 方法可以阻止事件的默认行为，但不能阻止事件继续沿着捕获阶段向下传递。
+
+在实际应用中，事件冒泡和事件捕获通常结合使用，以提供灵活的事件处理策略。例如，你可以在父元素上设置一个事件监听器来处理所有子元素的点击事件，同时在子元素上也设置监听器来处理特定的点击事件。当子元素被点击时，事件首先在子元素上被捕获并处理，然后冒泡到父元素。如果需要阻止冒泡，可以在子元素的事件处理函数中调用 `event.stopPropagation()`。
+
+为了在代码中指定事件的传播模式，可以在添加事件监听器时使用 `addEventListener` 方法，并传入第三个参数 `useCapture`。当 `useCapture` 为 `true` 时，事件监听器将在捕获阶段被调用；当 `useCapture` 为 `false` 时（默认值），事件监听器将在冒泡阶段被调用。
+
+```js
+// 在冒泡阶段监听事件
+element.addEventListener('click', function(event) {
+  console.log('Bubble phase');
+}, false);
+
+// 在捕获阶段监听事件
+element.addEventListener('click', function(event) {
+  console.log('Capture phase');
+}, true);
+```
 :::
 
 ::: details 模块化
+JavaScript 的模块化是将代码组织成独立的模块，每个模块都有自己的功能和接口，可以被其他模块导入和使用。模块化有助于提高代码的可读性、可维护性和可重用性。在 JavaScript 中，模块化可以通过几种不同的方式实现，包括：
+
+1. **CommonJS**:
+   - 这是 Node.js 中使用的模块系统。
+   - 模块通过 `require()` 函数导入，通过 `module.exports` 或 `exports` 对象导出。
+   - 每个文件都是一个模块，文件内容在第一次被 `require` 时执行。
+   - 示例：
+     ```javascript
+     // moduleA.js
+     module.exports = function() {
+       return 'Hello from module A';
+     };
+
+     // app.js
+     const moduleA = require('./moduleA');
+     console.log(moduleA()); // 输出: Hello from module A
+     ```
+
+2. **AMD (Asynchronous Module Definition)**:
+   - 这是在浏览器中使用的模块化规范，由 RequireJS 实现。
+   - 使用 `define()` 函数来定义模块，通过 `require()` 函数异步导入模块。
+   - 支持依赖管理和按需加载。
+   - 示例：
+     ```javascript
+     // moduleB.js
+     define(function() {
+       return function() {
+         return 'Hello from module B';
+       };
+     });
+
+     // app.js
+     require(['./moduleB'], function(moduleB) {
+       console.log(moduleB()); // 输出: Hello from module B
+     });
+     ```
+
+3. **ES6 Modules**:
+   - ECMAScript 6 (ES2015) 引入了原生的模块化语法。
+   - 使用 `import` 关键字来导入模块，使用 `export` 关键字来导出模块。
+   - 支持静态分析和静态导入，模块是静态的，意味着在编译时就已经确定。
+   - 示例：
+     ```javascript
+     // moduleC.js
+     export function sayHello() {
+       return 'Hello from module C';
+     }
+
+     // app.js
+     import { sayHello } from './moduleC.js';
+     console.log(sayHello()); // 输出: Hello from module C
+     ```
+
+4. **UMD (Universal Module Definition)**:
+   - 这是一种通用的模块定义方式，可以在浏览器和 Node.js 中使用。
+   - 通常结合了 CommonJS 和 AMD 的特点，通过检测环境来决定如何加载模块。
+   - 示例：
+     ```javascript
+     // umdModule.js
+     (function(root, factory) {
+       if (typeof define === 'function' && define.amd) {
+         // AMD. Register as an anonymous module.
+         define([], factory);
+       } else if (typeof exports === 'object') {
+         // Node. Does not work with strict CommonJS, but
+         // only CommonJS-like environments that support module.exports,
+         // like Node.
+         module.exports = factory();
+       } else {
+         // Browser globals (root is window)
+         root.returnExports = factory();
+       }
+     }(this, function() {
+       return function() {
+         return 'Hello from UMD module';
+       };
+     }));
+
+     // app.js
+     console.log(umdModule()); // 输出: Hello from UMD module
+     ```
+
+5. **SystemJS**:
+   - 这是一个动态模块加载系统，支持所有模块类型（CommonJS, AMD, ES6）。
+   - 使用 `System.import()` 来导入模块。
+   - 示例：
+     ```javascript
+     // systemModule.js
+     export function greet() {
+       return 'Hello from SystemJS module';
+     }
+
+     // app.js
+     System.import('./systemModule.js').then(function(module) {
+       console.log(module.greet()); // 输出: Hello from SystemJS module
+     });
+     ```
+
+在实际开发中，选择哪种模块化方案取决于项目的需求、目标环境以及团队的偏好。随着 ES6 模块化语法的普及，越来越多的项目开始采用原生的 `import` 和 `export` 语法来实现模块化。此外，现代的构建工具（如 Webpack、Rollup 和 Parcel）也提供了对模块化的支持，使得跨模块和跨项目的代码共享变得更加容易。
+:::
+
+::: details 【ES6】 - Modules
+特点
+
+- **静态分析**: 由于导入和导出都是在编译时解析的，这使得工具可以更容易地进行静态分析，优化代码。
+- **无运行时加载**: 与异步模块加载器（如 RequireJS）不同，ES6 Modules 不支持运行时加载模块。
+- **避免全局污染**: 模块化的目的就是避免全局作用域的污染，ES6 Modules 通过封装代码来实现这一点。
+- **支持模块嵌套**: 可以在模块内部导入和导出其他模块，形成模块的层次结构。
+- **兼容性**: 虽然 ES6 Modules 是 JavaScript 语言的一部分，但并不是所有浏览器都原生支持。这时可以使用构建工具（如 Babel 或 Webpack）来转译代码，或者使用 `<script type="module">` 标签在支持的浏览器中直接使用。
+
+使用场景
+
+- **前端开发**: 在现代的前端项目中，ES6 Modules 被广泛用于组织和管理代码。
+- **Node.js**: 虽然 Node.js 使用的是 CommonJS 模块系统，但从 Node.js v12 开始，它也支持 ES6 Modules。
+
+注意事项
+
+- **循环依赖**: ES6 Modules 不支持循环依赖，这可能会导致编译错误。
+- **默认导出限制**: 每个模块只能有一个默认导出，但可以有多个具名导出。
+- **严格模式**: ES6 Modules 默认是严格模式（'use strict'），这意味着某些不安全或不严谨的代码写法将会抛出错误。
+
 :::
 
 ::: details 【ES6】 - Promise
@@ -369,10 +566,70 @@ closureFunction(); // 输出：I am from outer function
 
 ## Builder
 ::: details 什么是 Webpack？它是如何工作的？
+Webpack 是一个现代 JavaScript 应用程序的静态模块打包器（module bundler）。在 Webpack 处理应用程序时，它会在内部构建一个依赖图（dependency graph），这个依赖图映射了项目所需的每个模块，并生成一个或多个 bundle（捆包文件）。
+
+Webpack 能够将许多不同类型的资源（不仅限于 JavaScript 文件）转换和打包到浏览器可加载的格式。它通过加载应用程序入口文件，分析代码中遇到的对象（如 `import` 或 `require`），并找出这些对象所依赖的其他模块，然后递归地构建一个内部依赖图。
+
+Webpack 也可以处理各种类型的模块，并将它们转换（transpile）为 JavaScript。这包括对 TypeScript、CSS、Less、Sass、图片和其他文件类型的处理。此外，Webpack 还提供了插件系统，允许开发者扩展其功能，例如通过插件来优化打包过程、清理输出目录、压缩打包后的文件等。
+
+Webpack 的工作流程大致如下：
+
+1. **初始化**:
+   - Webpack 启动后，会从配置文件（默认是 `webpack.config.js`）中读取配置。
+   - 配置文件中指定了入口文件（entry points）、输出文件（output）、加载器（loaders）和插件（plugins）等信息。
+
+2. **编译**:
+   - Webpack 从入口文件开始，递归地构建内部依赖图。
+   - 遇到不同类型的文件时，Webpack 会使用相应的加载器来处理这些文件。例如，`.js` 文件可能会通过 Babel 转换为向后兼容的 JavaScript 代码，而 `.css` 文件可能会通过 CSS-loader 转换为 JavaScript 模块。
+
+3. **模块解析**:
+   - Webpack 分析模块间的依赖关系，并将它们转换为模块对象。
+   - 对于每个模块，Webpack 都会执行其内容，并将模块对象添加到模块缓存中。
+
+4. **输出**:
+   - 一旦所有的模块都被处理完毕，Webpack 会根据依赖图生成一个或多个 bundle。
+   - 这些 bundle 包含了应用程序运行所需的所有模块和资源。
+
+5. **优化**:
+   - Webpack 可以应用各种优化策略，如代码分割（code splitting）、懒加载（lazy loading）、Tree shaking 等，以减少最终 bundle 的大小。
+
+6. **插件执行**:
+   - 在整个构建过程中，Webpack 会在特定的时间点触发事件钩子。
+   - 插件可以监听这些事件钩子，并在适当的时机执行自定义的任务，如压缩打包后的文件、清理构建目录等。
+
 :::
+
 ::: details 什么是 Babel？它是如何转换 ES6 代码的？
-:::
-::: details 什么是持续集成/持续部署（CI/CD）？
+Babel 是一个 JavaScript 编译器，它的主要作用是将现代 JavaScript 代码（通常是 ES6+ 代码）转换为向后兼容的 JavaScript 代码，以便在当前和旧版浏览器或环境中运行。Babel 通过转换 ES6 及更高版本的 JavaScript 语法特性，使得开发者能够使用最新的语言特性，同时确保代码能够在不支持这些特性的环境中正常工作。
+
+Babel 由几个核心组件构成：
+
+- **Babel CLI**: 命令行工具，用于将源代码转换为目标代码。
+- **Babel Core**: 包含转换逻辑的核心库。
+- **Babel Presets**: 预设配置，包含了一组插件，用于根据目标环境自动配置 Babel。
+- **Babel Plugins**: 插件，用于自定义转换逻辑。
+- **Babel Loaders**: 加载器，用于在模块打包工具（如 Webpack）中集成 Babel。
+
+Babel 的转换过程通常包括以下几个步骤：
+
+1. **解析（Parsing）**:
+   - Babel 首先解析源代码，将其从字符串形式转换为 AST（抽象语法树）。这个 AST 表示了代码的结构和语法。
+
+2. **转换（Transformation）**:
+   - 接下来，Babel 使用各种插件来遍历和修改 AST。这些插件负责将 ES6 语法转换为 ES5 或其他目标版本的 JavaScript 语法。例如，`transform-arrow-functions` 插件会将箭头函数转换为传统的函数表达式。
+
+3. **生成（Generation）**:
+   - 转换后的 AST 会被生成为新的代码字符串。这个新代码是兼容目标环境的 JavaScript 代码。
+
+4. **优化（Optimization）**:
+   - Babel 还可以优化生成的代码，以提高性能和减少文件大小。这可能包括移除未使用的代码、压缩代码等。
+
+5. **配置（Configuration）**:
+   - Babel 的行为可以通过 `.babelrc` 文件或项目中的其他配置文件进行配置。开发者可以指定要使用的预设和插件，以及转换的选项。
+
+Babel 的转换能力非常强大，它不仅可以转换语法，还可以转换新的 API 和语言特性，如类（classes）、模块导入导出（import/export）、模板字符串（template literals）、解构赋值（destructuring）等。此外，Babel 还支持实验性的 JavaScript 特性，如私有字段（private fields）和可选链（optional chaining）。
+
+通过使用 Babel，开发者可以在不牺牲兼容性的前提下，享受到 JavaScript 最新进展带来的好处。Babel 在现代 Web 开发中扮演着至关重要的角色，特别是在构建跨浏览器兼容的应用程序时。
 :::
 
 ## Browser
